@@ -1,0 +1,28 @@
+# node
+node_modules/
+.DS_Store
+.vscode/
+npm-debug.log*
+logs/
+
+#client
+deploy_prod.sh
+deploy_test.sh
+package-lock.json
+
+### 手动执行脚本生成的碎片数据
+script/logs/*.json
+*.sh
+*.db
+### webstorm
+.idea/
+
+mq/logs/
+
+### mocha test
+.nyc_output
+coverage
+
+# server
+config.local.yml
+*.work
