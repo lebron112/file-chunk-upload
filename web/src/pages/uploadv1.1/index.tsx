@@ -1,9 +1,10 @@
 
 import api from '@/services/api';
-import { Button, message } from 'antd';
+import { Button, message, Modal } from 'antd';
 import React, { useRef, useState } from 'react';
 import SparkMD5 from 'spark-md5';
 import { getArrayBuffer, getBase64, getColor, splitFile, TColor } from './fileChunk';
+import exifJs from 'exif-js';
 import maplimit from './maplimit';
 
 /** 获取文件的md5值  */
@@ -16,11 +17,35 @@ type TCheckMD5Res = {
   src: string;
 };
 
+const loadImgExifInfo = (arrayData: ArrayBuffer) => {
+  const exifRes = exifJs.readFromBinaryFile(arrayData);
+  if (exifRes) {
+    // delete exifRes.MakerNote;
+    if (exifRes.GPSLatitude) {
+      const [a, b, c] = exifRes.GPSLatitude;
+      exifRes.GPSLatPosition = a + (b + c / 60) / 60;
+    }
+    if (exifRes.GPSLongitude) {
+      const [a, b, c] = exifRes.GPSLongitude;
+      exifRes.GPSLongPosition = a + (b + c / 60) / 60;
+    }
+    Modal.info({
+      width: 1024,
+      title: 'Exif info',
+      content: (<div style={{ maxHeight: 600, overflow: 'auto' }}>
+        <pre>{JSON.stringify(exifRes, null, 2)}</pre>
+      </div>)
+    });
+  }
+};
+
 // web worker
 const checkMD5 = async (file: File, splitNumber: number):
   Promise<TCheckMD5Res> => Promise.resolve().then(async () => {
     const type = file.name.split('.').pop() || '';
     const arrayData = await getArrayBuffer(file);
+    loadImgExifInfo(arrayData);
+
     const chunks = await splitFile(file, splitNumber);
     const hash = new SparkMD5.ArrayBuffer().append(arrayData).end();
     console.log(hash);
@@ -58,6 +83,7 @@ const UploadPageV2 = () => {
   const [src, setSrc] = useState('');
   const [colors, setColors] = useState<TColor[]>([]);
   const [selCol, setSelColor] = useState('');
+
   const onChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     e.persist();
     setSelColor('');
@@ -66,7 +92,7 @@ const UploadPageV2 = () => {
     if (files && files[0]) {
       const file = files[0];
       const data = uploadDataRef.current = await checkMD5(file, 100);
-      console.log(data.src);
+
       setSrc(data.src);
       const color = await getColor(data.src);
       setColors(color);
@@ -85,7 +111,7 @@ const UploadPageV2 = () => {
       const execJobs = chunks.map(item => {
         return async () => {
           console.log(i);
-          i ++;
+          i++;
           const formData = new FormData();
           formData.append('file', item.file);
           formData.append('index', item.index.toString());
@@ -93,7 +119,7 @@ const UploadPageV2 = () => {
           formData.append('ext', type);
           const res = await api.fileUploadV2(formData);
           if (res) setPre((v) => v + 1);
-          i --;
+          i--;
         };
       });
       const d = Date.now();
