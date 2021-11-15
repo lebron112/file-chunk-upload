@@ -49,7 +49,7 @@ class UploadfileController {
         }
         await writeSpeedStream(temporaryFilePath, readStream, MB * 0.1);
         // 2、不限速 直接写入
-        // await fse.move(file.path, temporaryFilePath);
+        await fse.move(file.path, temporaryFilePath);
         resolve({ hash, ext, dir });
         // resolve({ hash, ext,dir });
       });

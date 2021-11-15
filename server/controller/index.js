@@ -49,7 +49,7 @@ class StaticController {
         });
       });
     });
-    ctx.body = { code: 200, data };
+    return data;
   }
 
   async getStaticSource(id) {

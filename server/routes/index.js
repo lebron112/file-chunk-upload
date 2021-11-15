@@ -3,8 +3,9 @@ const router = new Router();
 const staticController = require('../controller');
 const uploadControll = require('../controller/uploadfile');
 
-router.post('/api/file/upload/v1', (ctx) => {
-  staticController.uploadStatic(ctx);
+router.post('/api/file/upload/v1', async (ctx) => {
+  const data = await staticController.uploadStatic(ctx);
+  ctx.body = { code: 200, data };
 });
 // 切片上传的接口
 router.post('/api/file/upload/v2', async (ctx) => {

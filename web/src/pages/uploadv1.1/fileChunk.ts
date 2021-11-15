@@ -64,7 +64,7 @@ export const getColor = (src: string): Promise<TColor[]> => {
     img.onload = () => {
       themeColor(img, (data: TColor[]) => {
         res(data);
-      });
+      },);
     };
   });
 

@@ -81,6 +81,13 @@ const ImageListPage = () => {
           })
         }
       </Row>
+
+      {/* <Table pagination={{ pageSize: 100 }} dataSource={data} key='id'>
+        <FileColum dataIndex='filename' render={(v, r) => {
+          const { path, id } = r;
+          return <img src={`${path}/${id}`} width='100px' />;
+        }} />
+      </Table> */}
     </div>
   );
 };

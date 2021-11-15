@@ -22,7 +22,7 @@ const getT = (t) => (Date.now() - t) / 1000;
 // 并发最大速率
 const maxSize = MB * 1;
 
-/** 计算并发瞬时读取速度计算  */
+/** 计算并发瞬时读取速度  */
 const checkMaxSpeed = (maxSize) => {
   const speedObj = new Map();
   return {

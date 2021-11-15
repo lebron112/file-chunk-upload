@@ -154,6 +154,7 @@ function themeColor(img, callback, chunkNum = 8) {
 
   ctx.drawImage(img, 0, 0, width, height);
   imageData = ctx.getImageData(0, 0, width, height).data;
+  console.log(imageData, typeof imageData);
   const total = imageData.length / 4;
   let rMin = 255;
   let rMax = 0;

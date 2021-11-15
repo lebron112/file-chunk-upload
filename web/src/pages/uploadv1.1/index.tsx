@@ -16,6 +16,7 @@ type TCheckMD5Res = {
   src: string;
 };
 
+// web worker
 const checkMD5 = async (file: File, splitNumber: number):
   Promise<TCheckMD5Res> => Promise.resolve().then(async () => {
     const type = file.name.split('.').pop() || '';
@@ -65,6 +66,7 @@ const UploadPageV2 = () => {
     if (files && files[0]) {
       const file = files[0];
       const data = uploadDataRef.current = await checkMD5(file, 100);
+      console.log(data.src);
       setSrc(data.src);
       const color = await getColor(data.src);
       setColors(color);
@@ -77,12 +79,13 @@ const UploadPageV2 = () => {
     if (!selCol) return message.warn('请选择一个主题色');
     setLoading(true);
     const uploadData = uploadDataRef.current;
-
+    let i = 0;
     if (uploadData) {
       const { hash, chunks, type, name } = uploadData;
       const execJobs = chunks.map(item => {
         return async () => {
-          // console.log(i);
+          console.log(i);
+          i ++;
           const formData = new FormData();
           formData.append('file', item.file);
           formData.append('index', item.index.toString());
@@ -90,11 +93,12 @@ const UploadPageV2 = () => {
           formData.append('ext', type);
           const res = await api.fileUploadV2(formData);
           if (res) setPre((v) => v + 1);
+          i --;
         };
       });
       const d = Date.now();
       // 并发控制执行的函数 
-      await maplimit(execJobs, 4);
+      await maplimit(execJobs, 10);
       // for(const item of execJobs) {
       //   await item();
       // }
